@@ -8,82 +8,87 @@ import (
 	"github.com/spf13/cobra"
 )
 
+var folders = map[string]string{
+	// Documents
+	".pdf":  "PDFs",
+	".doc":  "Documents",
+	".docx": "Documents",
+	".xls":  "Spreadsheets",
+	".xlsx": "Spreadsheets",
+	".ppt":  "Presentations",
+	".pptx": "Presentations",
+	".txt":  "Texts",
+	".csv":  "Spreadsheets",
+	".md":   "Documents",
+
+	// Images
+	".png":  "Images",
+	".jpg":  "Images",
+	".jpeg": "Images",
+	".gif":  "Images",
+	".svg":  "Images",
+	".webp": "Images",
+	".ico":  "Images",
+	".bmp":  "Images",
+
+	// Videos
+	".mp4":  "Videos",
+	".mov":  "Videos",
+	".avi":  "Videos",
+	".mkv":  "Videos",
+	".webm": "Videos",
+
+	// Audio
+	".mp3":  "Audio",
+	".wav":  "Audio",
+	".flac": "Audio",
+	".aac":  "Audio",
+	".ogg":  "Audio",
+
+	// Archives
+	".zip": "Archives",
+	".rar": "Archives",
+	".7z":  "Archives",
+	".tar": "Archives",
+	".gz":  "Archives",
+
+	// Code
+	".go":   "Code",
+	".js":   "Code",
+	".ts":   "Code",
+	".py":   "Code",
+	".html": "Code",
+	".css":  "Code",
+	".json": "Code",
+
+	// Fonts
+	".ttf":  "Fonts",
+	".otf":  "Fonts",
+	".woff": "Fonts",
+
+	// Installers
+	".exe": "Executables",
+	".msi": "Executables",
+	".dmg": "Executables",
+}
+
+func exit(err string) {
+	fmt.Println(err)
+	os.Exit(1)
+}
+
 func organizeFolder(cmd *cobra.Command, args []string) {
 	dir := args[0]
 
 	files, err := os.ReadDir(dir)
 
 	if err != nil {
-		fmt.Println("Error happened", err)
-		os.Exit(1)
+		exit("Error reading the file")
 	}
 
-	folders := map[string]string{
-		// Documents
-		".pdf":  "PDFs",
-		".doc":  "Documents",
-		".docx": "Documents",
-		".xls":  "Spreadsheets",
-		".xlsx": "Spreadsheets",
-		".ppt":  "Presentations",
-		".pptx": "Presentations",
-		".txt":  "Texts",
-		".csv":  "Spreadsheets",
-		".md":   "Documents",
-
-		// Images
-		".png":  "Images",
-		".jpg":  "Images",
-		".jpeg": "Images",
-		".gif":  "Images",
-		".svg":  "Images",
-		".webp": "Images",
-		".ico":  "Images",
-		".bmp":  "Images",
-
-		// Videos
-		".mp4":  "Videos",
-		".mov":  "Videos",
-		".avi":  "Videos",
-		".mkv":  "Videos",
-		".webm": "Videos",
-
-		// Audio
-		".mp3":  "Audio",
-		".wav":  "Audio",
-		".flac": "Audio",
-		".aac":  "Audio",
-		".ogg":  "Audio",
-
-		// Archives
-		".zip": "Archives",
-		".rar": "Archives",
-		".7z":  "Archives",
-		".tar": "Archives",
-		".gz":  "Archives",
-
-		// Code
-		".go":   "Code",
-		".js":   "Code",
-		".ts":   "Code",
-		".py":   "Code",
-		".html": "Code",
-		".css":  "Code",
-		".json": "Code",
-
-		// Fonts
-		".ttf":  "Fonts",
-		".otf":  "Fonts",
-		".woff": "Fonts",
-
-		// Installers
-		".exe": "Executables",
-		".msi": "Executables",
-		".dmg": "Executables",
-	}
+	countFile := 0
 
 	for _, file := range files {
-
 		if file.IsDir() {
 			continue
 		}
@@ -96,26 +101,26 @@ func organizeFolder(cmd *cobra.Command, args []string) {
 			continue
 		}
 
-		folderPath := filepath.Join(dir, folder)
-
-		err := os.MkdirAll(folderPath, os.ModePerm)
+		newFolderPath := filepath.Join(dir, folder)
+		err := os.MkdirAll(newFolderPath, os.ModePerm)
 
 		if err != nil {
-			fmt.Println("Error while creating a dir", err)
-			os.Exit(1)
+			exit("Error while creating folder")
 		}
 
 		oldPath := filepath.Join(dir, file.Name())
-		err = os.Rename(oldPath, filepath.Join(folderPath, file.Name()))
+		newPath := filepath.Join(newFolderPath, file.Name())
+
+		err = os.Rename(oldPath, newPath)
 
 		if err != nil {
-			fmt.Println("Error while moving file to new folder", err)
-			os.Exit(1)
+			exit("error while moving to new folder")
 		}
 
-		fmt.Println("Successful")
-
+		countFile++
 	}
+
+	fmt.Printf("%d files has been successfully categorized\n", countFile)
 
 }
 
