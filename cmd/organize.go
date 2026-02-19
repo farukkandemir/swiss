@@ -72,8 +72,8 @@ var folders = map[string]string{
 	".dmg": "Executables",
 }
 
-func exit(err string) {
-	fmt.Println(err)
+func exit(message string, err error) {
+	fmt.Fprintf(os.Stderr, "%s: %s\n", message, err)
 	os.Exit(1)
 }
 
@@ -83,7 +83,7 @@ func organizeFolder(cmd *cobra.Command, args []string) {
 	files, err := os.ReadDir(dir)
 
 	if err != nil {
-		exit("Error reading the file")
+		exit("Error reading directory", err)
 	}
 
 	countFile := 0
@@ -105,7 +105,7 @@ func organizeFolder(cmd *cobra.Command, args []string) {
 		err := os.MkdirAll(newFolderPath, os.ModePerm)
 
 		if err != nil {
-			exit("Error while creating folder")
+			exit("Error creating folder", err)
 		}
 
 		oldPath := filepath.Join(dir, file.Name())
@@ -114,7 +114,7 @@ func organizeFolder(cmd *cobra.Command, args []string) {
 		err = os.Rename(oldPath, newPath)
 
 		if err != nil {
-			exit("error while moving to new folder")
+			exit("Error moving file", err)
 		}
 
 		countFile++
